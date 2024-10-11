@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:process_run/shell.dart';
 
 void main() {
   runApp(MyApp());
@@ -25,21 +26,36 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool _isToggled = false;
+  final Shell shell = Shell();
+
+  void _toggleGPIO() async {
+    String command = _isToggled
+        ? 'gpioset --mode=exit gpiochip4 26=1'
+        : 'gpioset --mode=exit gpiochip4 26=0';
+
+    try {
+      await shell.run(command);
+      print("GPIO command executed: $command");
+    } catch (e) {
+      print("Error running GPIO command: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('Hello, World!'), // This remains as your original Hello, World! text
-        SizedBox(height: 20), // Adds some space between the text and the button
+        Text('Hello, World!'), // Keeping the "Hello, World!" text as requested
+        SizedBox(height: 20), // Space between text and button
         ElevatedButton(
           onPressed: () {
             setState(() {
               _isToggled = !_isToggled; // Toggle the state
+              _toggleGPIO(); // Run the GPIO command when toggled
             });
           },
-          child: Text(_isToggled ? 'ON' : 'OFF'), // Display the button label
+          child: Text(_isToggled ? 'ON' : 'OFF'),
         ),
       ],
     );
